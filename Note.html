@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+    @import url(./style.css);
+
+    #note-container {
+        gap: 20px;
+        height: 100%;
+    }
+
+    #title {
+        color: white;
+        text-align: center;
+    }
+
+    #tags-container {
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #tags-container>span {
+        border: 1px solid darkgray;
+        color: green;
+        padding: 5px;
+        font-size: 0.9rem;
+    }
+
+    #solution {
+        margin-top: 5px;
+    }
+
+    #solutions-nav {
+        display: flex;
+        gap: 10px;
+    }
+
+    button.solution-selector {
+        border: 1px solid green;
+        background-color: darkgrey;
+        padding: 2px;
+        font-size: 0.8rem;
+    }
+
+    a.link {
+        text-decoration: none;
+    }
+
+    #links-container {
+        margin-top: auto;
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note</title>
+</head>
+
+<body>
+    <div id="navbar">
+        <!-- placeholder -->
+    </div>
+    <div id="window">
+        <div id="note-container" class="flex-col">
+            <h1 id="title">
+                <!-- dynamic -->
+            </h1>
+            <div id="tags-container" class="flex-row">
+                <!-- dyanmic -->
+            </div>
+            <div id="description-container">
+                <h5>Description:</h5>
+                <p id="description">
+                    <!-- dyanmic -->
+                </p>
+            </div>
+            <div id="solutions-container" class="flex-col">
+                <h5>Solutions:</h5>
+                <div id="solutions-nav">
+                </div>
+                <div id="solution">
+
+                </div>
+                <!-- dyanmic -->
+            </div>
+            <div id="links-container" class="flex-col">
+                <!-- dyanmic -->
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="module">
+    import * as domUtils from "./DomUtils.js"
+
+    //ELEMENTS IDENTIFIERS
+    const SOLUTIONS_CONTAINER_ID = "solution";
+    const TAGS_CONTAINER_ID = "tags-container";
+    const LINKS_CONTAINER_ID = "links-container";
+    const TITLE_ID = "title";
+    const DESCRIPTION_ID = "description"
+    const SOLUTIONS_NAV_ID = "solutions-nav";
+    const SOLUTION_CONTAINER_ID = "solution"
+    const DISPLAYED_SOLUTIN_ELEMENT_ID = "displayed-solution"
+
+    let solutions;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const note = fetchNote();
+        appendNote(note);
+
+        solutions = note.solutions;
+    });
+
+    function appendNote(note) {
+        domUtils.setTextForElementById(TITLE_ID, note.title);
+        appendTags(note.tags);
+        domUtils.setTextForElementById(DESCRIPTION_ID, note.description);
+        appendDefaultSolution(note.solutions);
+        appendLinks(note.links);
+    }
+
+    function appendLinks(links) {
+        if (!links) return;
+        const linksContainer = document.getElementById(LINKS_CONTAINER_ID);
+        linksContainer.appendChild(domUtils.createElementWithText("h5", "Links:"));
+        links.forEach(link => {
+            const linkElement = domUtils.createElementWithText("a", link.url);
+            linkElement.setAttribute("href", link.url);
+            linkElement.setAttribute("class", "link")
+            linksContainer.appendChild(linkElement);
+        });
+    }
+
+    function appendDefaultSolution(solutions) {
+        const solutionsContainer = document.getElementById(SOLUTIONS_CONTAINER_ID);
+        const solution = solutions[0];
+        const solutionElement = domUtils.createElementWithText("p", solution.description);
+        solutionElement.setAttribute("id", "displayed-solution")
+        solutionsContainer.appendChild(solutionElement);
+        appendSolutionsNavigation(solutions.map(solution => solution.id));
+    }
+
+    function appendSolutionsNavigation(solutionsIds) {
+        const solutionsNavContainer = document.getElementById(SOLUTIONS_NAV_ID);
+
+        for (let i = 0; i < solutionsIds.length; i++) {
+            const navButton = document.createElement("button");
+            navButton.setAttribute("id", solutionsIds[i]);
+            navButton.setAttribute("class", "solution-selector")
+            navButton.textContent = i + 1;
+            navButton.addEventListener("click", event => {
+                changeDisplayedSolution(solutionsIds[i]);
+            })
+            solutionsNavContainer.appendChild(navButton);
+        }
+    }
+
+    function changeDisplayedSolution(desiredSolutionId) {
+        const displayedSoluionElement = document.getElementById(DISPLAYED_SOLUTIN_ELEMENT_ID);
+        const desiredSolutionDescription = solutions.filter(solution => solution.id == desiredSolutionId)[0].description;
+        displayedSoluionElement.innerText = desiredSolutionDescription;
+    }
+
+    function appendTags(tags) {
+        const tagsContainer = document.getElementById(TAGS_CONTAINER_ID);
+        tags.forEach(tag => {
+            const newTag = document.createElement("span");
+            newTag.textContent = tag;
+            tagsContainer.appendChild(newTag);
+        })
+    }
+
+    function fetchNote() {
+        return {
+            id: 1,
+            title: "Lorem ipsum dolor sit amet",
+            tags: ["No", "Test", "Yes"],
+            visiblity: "public",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum rem temporibus atque asperiores veniam. Deserunt quia nisi tenetur fuga perferendis labore dicta optio sed, esse accusantium ratione nihil dolorem fugiat.",
+            solutions: [
+                {
+                    id: 1,
+                    description: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laborum facilis, magni earum temporibus ex mollitia rem quia. Nostrum hic eius incidunt! Iure, quae dignissimos minus eaque voluptate doloribus fuga saepe."
+                },
+                {
+                    id: 2,
+                    description: "Lorem Test Test Test Test"
+                }
+            ],
+            links: [
+                {
+                    type: "stackoverflow",
+                    url: "www.google.com"
+                },
+                {
+                    type: "github",
+                    url: "www.test.com"
+                }
+            ]
+        }
+    }
+</script>
+
+</html>
