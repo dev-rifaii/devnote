@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
 <style>
     @import url(./style.css);
+    @import url(./code-style.css);
 
     #note-container {
         gap: 20px;
-        height: 100%;
+        min-height: 100%;
     }
 
     #title {
@@ -50,6 +52,7 @@
     #links-container {
         margin-top: auto;
     }
+
 </style>
 
 <head>
@@ -94,6 +97,7 @@
 
 <script type="module">
     import * as domUtils from "./DomUtils.js"
+    import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
 
     //ELEMENTS IDENTIFIERS
     const SOLUTIONS_CONTAINER_ID = "solution";
@@ -112,12 +116,13 @@
         appendNote(note);
 
         solutions = note.solutions;
+        hilightCode();
     });
 
     function appendNote(note) {
         domUtils.setTextForElementById(TITLE_ID, note.title);
         appendTags(note.tags);
-        domUtils.setTextForElementById(DESCRIPTION_ID, note.description);
+        domUtils.setTextForElementById(DESCRIPTION_ID, containarizeCodeInString(note.description));
         appendDefaultSolution(note.solutions);
         appendLinks(note.links);
     }
@@ -137,7 +142,7 @@
     function appendDefaultSolution(solutions) {
         const solutionsContainer = document.getElementById(SOLUTIONS_CONTAINER_ID);
         const solution = solutions[0];
-        const solutionElement = domUtils.createElementWithText("p", solution.description);
+        const solutionElement = domUtils.createElementWithText("p", containarizeCodeInString(solution.description));
         solutionElement.setAttribute("id", "displayed-solution")
         solutionsContainer.appendChild(solutionElement);
         appendSolutionsNavigation(solutions.map(solution => solution.id));
@@ -161,7 +166,8 @@
     function changeDisplayedSolution(desiredSolutionId) {
         const displayedSoluionElement = document.getElementById(DISPLAYED_SOLUTIN_ELEMENT_ID);
         const desiredSolutionDescription = solutions.filter(solution => solution.id == desiredSolutionId)[0].description;
-        displayedSoluionElement.innerText = desiredSolutionDescription;
+        displayedSoluionElement.innerHTML = containarizeCodeInString(desiredSolutionDescription);
+        hilightCode();
     }
 
     function appendTags(tags) {
@@ -173,21 +179,96 @@
         })
     }
 
+    function containarizeCodeInString(string) {
+        let regex = /^```[\s\S]*?```$/gm;
+
+        if (!regex.test(string)) return string;
+        let newString = string.replaceAll(regex, (match, key) => {
+            return wrapCodeInElements(match.slice(3, -3));
+        })
+        return newString;
+    }
+
+    function hilightCode() {
+        document.querySelectorAll('pre code').forEach((element) => {
+            hljs.highlightElement(element);
+        });
+    }
+
+    function wrapCodeInElements(code) {
+        return `
+        <div class="code-section flex-col">
+            <div class="code-section-header"></div>
+            <div class="code-container">
+                <pre>
+                    <code>${code}</code>
+                </pre>
+            </div>
+        </div>
+        `;
+    }
+
     function fetchNote() {
         return {
             id: 1,
             title: "Lorem ipsum dolor sit amet",
             tags: ["No", "Test", "Yes"],
             visiblity: "public",
-            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum rem temporibus atque asperiores veniam. Deserunt quia nisi tenetur fuga perferendis labore dicta optio sed, esse accusantium ratione nihil dolorem fugiat.",
+            description: `
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum rem temporibus atque asperiores veniam. Deserunt quia nisi tenetur fuga perferendis labore dicta optio sed, esse accusantium ratione nihil dolorem fugiat.
+\`\`\`
+ document.addEventListener("DOMContentLoaded", () => {
+ const note = fetchNote();
+ appendNote(note);
+
+ solutions = note.solutions;
+ });
+ \`\`\`
+            `,
             solutions: [
                 {
                     id: 1,
-                    description: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laborum facilis, magni earum temporibus ex mollitia rem quia. Nostrum hic eius incidunt! Iure, quae dignissimos minus eaque voluptate doloribus fuga saepe."
+                    description: `Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laborum facilis, magni earum temporibus ex mollitia rem quia. Nostrum hic eius incidunt! Iure, quae dignissimos minus eaque voluptate doloribus fuga saepe.
+\`\`\`
+@Override
+@SuppressWarnings("unchecked")
+public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+    objs.forEach((String modelName, Object properties) -> {
+
+        Map<String, Object> modelProperties = (Map<String, Object>) properties;
+        List<HashMap<String, Object>> models = (List<HashMap<String, Object>>) modelProperties.get("models");
+
+        models.stream()
+            .map(map -> map.get("model"))
+            .forEach(prop -> removeEnumsFromModel((CodegenModel) prop));
+    });
+
+    return super.postProcessAllModels(objs);
+}                    
+\`\`\`
+                    `
                 },
                 {
                     id: 2,
-                    description: "Lorem Test Test Test Test"
+                    description: `Lorem Test Test Test Test
+\`\`\`
+@Override
+@SuppressWarnings("unchecked")
+public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
+    objs.forEach((String modelName, Object properties) -> {
+
+        Map<String, Object> modelProperties = (Map<String, Object>) properties;
+        List<HashMap<String, Object>> models = (List<HashMap<String, Object>>) modelProperties.get("models");
+
+        models.stream()
+            .map(map -> map.get("model"))
+            .forEach(prop -> removeEnumsFromModel((CodegenModel) prop));
+    });
+
+    return super.postProcessAllModels(objs);
+}                
+\`\`\`
+                    `
                 }
             ],
             links: [
