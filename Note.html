@@ -31,6 +31,7 @@
 
     #solution {
         margin-top: 5px;
+        height: 100%;
     }
 
     #solutions-nav {
@@ -53,7 +54,6 @@
     #links-container {
         margin-top: auto;
     }
-
 </style>
 
 <head>
@@ -74,18 +74,19 @@
             <div id="tags-container" class="flex-row">
                 <!-- dyanmic -->
             </div>
-            <div id="description-container">
+            <div id="description-section" class="flex-col">
                 <h5>Description:</h5>
-                <p id="description">
+                <div id="description">
                     <!-- dyanmic -->
-                </p>
+                </div>
             </div>
-            <div id="solutions-container" class="flex-col">
+            <div id="solutions-section" class="flex-col">
                 <h5>Solutions:</h5>
                 <div id="solutions-nav">
+                    <!-- dyanmic -->
                 </div>
                 <div id="solution">
-
+                    <!-- dyanmic -->
                 </div>
                 <!-- dyanmic -->
             </div>
@@ -97,66 +98,106 @@
 </body>
 
 <script type="module">
-    import * as domUtils from "./DomUtils.js"
     import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
 
+    import * as domUtils from "./DomUtils.js"
+    import * as customElementsBuilder from "./CustomElementsBuilder.js";
+
     //ELEMENTS IDENTIFIERS
-    const SOLUTIONS_CONTAINER_ID = "solution";
+    // const SOLUTIONS_CONTAINER_ID = "solution";
     const TAGS_CONTAINER_ID = "tags-container";
     const LINKS_CONTAINER_ID = "links-container";
-    const TITLE_ID = "title";
-    const DESCRIPTION_ID = "description"
-    const SOLUTIONS_NAV_ID = "solutions-nav";
-    const SOLUTION_CONTAINER_ID = "solution"
-    const DISPLAYED_SOLUTIN_ELEMENT_ID = "displayed-solution"
+    const SOLUTIONS_NAV_CONTAINER_ID = "solutions-nav";
+    const TITLE_ELEMENT_ID = "title";
+    const DESCRIPTION_ELEMENT_ID = "description"
+    const DISPLAYED_SOLUTION_CONTAINER_ID = "solution"
 
     let solutions;
 
     document.addEventListener("DOMContentLoaded", () => {
         const note = fetchNote();
-        appendNote(note);
+        renderNote(note);
 
         solutions = note.solutions;
         hilightCode();
     });
 
-    function appendNote(note) {
-        domUtils.setTextForElementById(TITLE_ID, note.title);
-        appendTags(note.tags);
-        domUtils.setTextForElementById(DESCRIPTION_ID, containarizeCodeInString(note.description));
-        appendDefaultSolution(note.solutions);
-        appendLinks(note.links);
+    function renderNote(note) {
+        domUtils.setTextForElementById(TITLE_ELEMENT_ID, note.title);
+        renderTags(note.tags);
+        renderDescription(note.description);
+        renderDefaultSolution(note.solutions);
+        renderLinks(note.links);
     }
 
-    function appendLinks(links) {
+    function renderDescription(description) {
+        renderCodeFriendlySection(description, DESCRIPTION_ELEMENT_ID);
+    }
+
+    function renderDefaultSolution(solutions) {
+        const solution = solutions[0];
+        renderCodeFriendlySection(solution.description, DISPLAYED_SOLUTION_CONTAINER_ID);
+        renderSolutionsNavigation(solutions.map(solution => solution.id));
+    }
+
+    function renderCodeFriendlySection(string, elementId) {
+        const element = document.getElementById(elementId);
+
+        const tokensSet = tokenizeStringContainingCode(string);
+        tokensSet.forEach(obj => {
+            if (obj.type === 'text') {
+                element.appendChild(domUtils.createElementWithText("p", obj.content));
+            } else if (obj.type === 'code') {
+                element.appendChild(customElementsBuilder.createCodeSection(obj.content));
+            }
+        });
+    }
+
+    function tokenizeStringContainingCode(string) {
+        const set = new Set();
+
+        let indexOfLastNonCodeChar = 0;
+        for (let i = 0; i < string.length; i++) {
+            //found opening backticks?
+            if (string.charAt(i) === '\`' && string.charAt(i + 1) === '\`' && string.charAt(i + 2) === '\`') {
+                set.add({ type: "text", content: string.slice(indexOfLastNonCodeChar, i - 1) });
+
+                //find closing backticks
+                for (let j = i + 3; j < string.length; j++) {
+                    if ((string.charAt(j) === '\`' && string.charAt(j + 1) === '\`' && string.charAt(j + 2) === '\`')) {
+                        set.add({ type: "code", content: string.slice(i, j + 3).replaceAll("\`", "") });
+                        indexOfLastNonCodeChar = j + 3;
+                        i = j + 2;
+                        break;
+                    }
+                }
+            }
+        }
+
+        console.log(set);
+        return set;
+    }
+
+    function renderLinks(links) {
         if (!links) return;
         const linksContainer = document.getElementById(LINKS_CONTAINER_ID);
         linksContainer.appendChild(domUtils.createElementWithText("h5", "Links:"));
         links.forEach(link => {
             const linkElement = domUtils.createElementWithText("a", link.url);
             linkElement.setAttribute("href", link.url);
-            linkElement.setAttribute("class", "link")
+            linkElement.classList.add("link");
             linksContainer.appendChild(linkElement);
         });
     }
 
-    function appendDefaultSolution(solutions) {
-        const solutionsContainer = document.getElementById(SOLUTIONS_CONTAINER_ID);
-        const solution = solutions[0];
-        const solutionElement = domUtils.createElementWithText("p", containarizeCodeInString(solution.description));
-        solutionElement.setAttribute("id", "displayed-solution")
-        solutionsContainer.appendChild(solutionElement);
-        appendSolutionsNavigation(solutions.map(solution => solution.id));
-    }
 
-    function appendSolutionsNavigation(solutionsIds) {
-        const solutionsNavContainer = document.getElementById(SOLUTIONS_NAV_ID);
+    function renderSolutionsNavigation(solutionsIds) {
+        const solutionsNavContainer = document.getElementById(SOLUTIONS_NAV_CONTAINER_ID);
 
         for (let i = 0; i < solutionsIds.length; i++) {
-            const navButton = document.createElement("button");
+            const navButton = domUtils.createElementWithText("button", i + 1);
             navButton.setAttribute("id", solutionsIds[i]);
-            navButton.setAttribute("class", "solution-selector")
-            navButton.textContent = i + 1;
+            navButton.classList.add("solution-selector")
             navButton.addEventListener("click", event => {
                 changeDisplayedSolution(solutionsIds[i]);
             })
@@ -165,27 +206,26 @@
     }
 
     function changeDisplayedSolution(desiredSolutionId) {
-        const displayedSoluionElement = document.getElementById(DISPLAYED_SOLUTIN_ELEMENT_ID);
+        const displayedSoluionElement = document.getElementById(DISPLAYED_SOLUTION_CONTAINER_ID);
         const desiredSolutionDescription = solutions.filter(solution => solution.id == desiredSolutionId)[0].description;
-        displayedSoluionElement.innerHTML = containarizeCodeInString(desiredSolutionDescription);
+        displayedSoluionElement.innerHTML = extractCodeFromString(desiredSolutionDescription);
         hilightCode();
     }
 
-    function appendTags(tags) {
+    function renderTags(tags) {
         const tagsContainer = document.getElementById(TAGS_CONTAINER_ID);
         tags.forEach(tag => {
-            const newTag = document.createElement("span");
-            newTag.textContent = tag;
+            const newTag = domUtils.createElementWithText("span", tag);
             tagsContainer.appendChild(newTag);
         })
     }
 
-    function containarizeCodeInString(string) {
+    function extractCodeFromString(string) {
         let regex = /^```[\s\S]*?```$/gm;
 
         if (!regex.test(string)) return string;
         let newString = string.replaceAll(regex, (match, key) => {
-            return wrapCodeInElements(match.slice(3, -3));
+            return match.slice(3, -3);
         })
         return newString;
     }
@@ -194,18 +234,6 @@
         document.querySelectorAll('pre code').forEach((element) => {
             hljs.highlightElement(element);
         });
-    }
-
-    function wrapCodeInElements(code) {
-        return `
-        <div class="code-section">
-            <div class="code-section-header"></div>
-                    <pre>
-                        <code>${code}</code>
-                    </pre>
-            </div>
-        </div>
-        `;
     }
 
     function fetchNote() {
@@ -217,13 +245,20 @@
             description: `
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum rem temporibus atque asperiores veniam. Deserunt quia nisi tenetur fuga perferendis labore dicta optio sed, esse accusantium ratione nihil dolorem fugiat.
 \`\`\`
- document.addEventListener("DOMContentLoaded", () => {
- const note = fetchNote();
- appendNote(note);
-
- solutions = note.solutions;
- });
- \`\`\`
+document.addEventListener("DOMContentLoaded", () => {
+const note = fetchNote();
+renderNote(note);
+solutions = note.solutions;
+});
+\`\`\`
+223232Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum rem temporibus atque asperiores veniam. Deserunt quia nisi tenetur fuga perferendis labore dicta optio sed, esse accusantium ratione nihil dolorem fugiat.
+\`\`\`
+function hilightCode() {
+        document.querySelectorAll('pre code').forEach((element) => {
+            hljs.highlightElement(element);
+        });
+    }
+\`\`\`
             `,
             solutions: [
                 {

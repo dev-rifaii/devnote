@@ -49,3 +49,12 @@ body {
     display: flex;
     flex-direction: row;
 }
+
+button {
+     color: white;
+     border: none;
+     background-color: #525CEB;
+     padding: 2px;
+     font-size: 0.8rem;
+     cursor: pointer;
+}
