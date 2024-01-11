@@ -126,7 +126,8 @@
         domUtils.setTextForElementById(TITLE_ELEMENT_ID, note.title);
         renderTags(note.tags);
         renderDescription(note.description);
-        renderDefaultSolution(note.solutions);
+        renderSolution(note.solutions[0]);
+        renderSolutionsNavigation(note.solutions.map(solution => solution.id));
         renderLinks(note.links);
     }
 
@@ -134,10 +135,8 @@
         renderCodeFriendlySection(description, DESCRIPTION_ELEMENT_ID);
     }
 
-    function renderDefaultSolution(solutions) {
-        const solution = solutions[0];
+    function renderSolution(solution) {
         renderCodeFriendlySection(solution.description, DISPLAYED_SOLUTION_CONTAINER_ID);
-        renderSolutionsNavigation(solutions.map(solution => solution.id));
     }
 
     function renderCodeFriendlySection(string, elementId) {
@@ -206,9 +205,7 @@
     }
 
     function changeDisplayedSolution(desiredSolutionId) {
-        const displayedSoluionElement = document.getElementById(DISPLAYED_SOLUTION_CONTAINER_ID);
-        const desiredSolutionDescription = solutions.filter(solution => solution.id == desiredSolutionId)[0].description;
-        displayedSoluionElement.innerHTML = extractCodeFromString(desiredSolutionDescription);
+        renderSolution(solutions.filter(solution => solution.id == desiredSolutionId)[0]);
         hilightCode();
     }
 
