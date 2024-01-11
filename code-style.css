@@ -1,34 +1,20 @@
-@import url('https://fonts.cdnfonts.com/css/jetbrains-mono');
-
 .code-section {
-    border: 1px solid grey;
-    /* width: fit-content; */
-    /* overflow: scroll; */
-}
-
-.code-container {
-    overflow:auto;
-    padding: 15px;
+    border: 1px solid rgb(71, 71, 71);
+    width: fit-content;
+    height: fit-content;
 }
 
 .code-section-header {
     background-color: gray;
-    /* border: 1px solid green; */
-}
-
-code {
-    width: fit-content;
-    /* font-family: 'JetBrains Mono', sans-serif; */
-    /* font-size: 0.6rem; */
 }
 
 .hljs {
-    background-color: black;
+    background-color: #2d2d2d;
     color: white;
 }
 
 pre code.hljs {
-    padding: 0;
+    padding: 15px;
 }
 
 .function_ {
@@ -41,8 +27,4 @@ pre code.hljs {
 
 .hljs-string {
     color: purple;
-}
-
-.hljs-meta {
-    color: ;
 }

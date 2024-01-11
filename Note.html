@@ -39,8 +39,9 @@
     }
 
     button.solution-selector {
-        border: 1px solid green;
-        background-color: darkgrey;
+        color: white;
+        border: none;
+        background-color: #525CEB;
         padding: 2px;
         font-size: 0.8rem;
     }
@@ -197,12 +198,11 @@
 
     function wrapCodeInElements(code) {
         return `
-        <div class="code-section flex-col">
+        <div class="code-section">
             <div class="code-section-header"></div>
-            <div class="code-container">
-                <pre>
-                    <code>${code}</code>
-                </pre>
+                    <pre>
+                        <code>${code}</code>
+                    </pre>
             </div>
         </div>
         `;
