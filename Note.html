@@ -9,6 +9,7 @@
     #note-container {
         gap: 20px;
         min-height: 100%;
+        overflow: auto;
     }
 
     #title {
@@ -32,6 +33,11 @@
     #solution {
         margin-top: 5px;
         height: 100%;
+        gap: 12px;
+    }
+
+    #description {
+        gap: 12px;
     }
 
     #solutions-nav {
@@ -76,7 +82,7 @@
             </div>
             <div id="description-section" class="flex-col">
                 <h5>Description:</h5>
-                <div id="description">
+                <div id="description" class="flex-col">
                     <!-- dyanmic -->
                 </div>
             </div>
@@ -85,7 +91,7 @@
                 <div id="solutions-nav">
                     <!-- dyanmic -->
                 </div>
-                <div id="solution">
+                <div id="solution" class="flex-col">
                     <!-- dyanmic -->
                 </div>
                 <!-- dyanmic -->
@@ -131,6 +137,11 @@
         renderLinks(note.links);
     }
 
+    function changeDisplayedSolution(desiredSolutionId) {
+        renderSolution(solutions.filter(solution => solution.id == desiredSolutionId)[0]);
+        hilightCode();
+    }
+
     function renderDescription(description) {
         renderCodeFriendlySection(description, DESCRIPTION_ELEMENT_ID);
     }
@@ -141,13 +152,18 @@
 
     function renderCodeFriendlySection(string, elementId) {
         const element = document.getElementById(elementId);
+        const replacement = document.createElement("div");
+        replacement.classList.add(element.classList);
+        replacement.id = element.id;
+
+        element.parentNode.replaceChild(replacement, element);
 
         const tokensSet = tokenizeStringContainingCode(string);
         tokensSet.forEach(obj => {
             if (obj.type === 'text') {
-                element.appendChild(domUtils.createElementWithText("p", obj.content));
+                replacement.appendChild(domUtils.createElementWithText("p", obj.content));
             } else if (obj.type === 'code') {
-                element.appendChild(customElementsBuilder.createCodeSection(obj.content));
+                replacement.appendChild(customElementsBuilder.createCodeSection(obj.content));
             }
         });
     }
@@ -173,7 +189,6 @@
             }
         }
 
-        console.log(set);
         return set;
     }
 
@@ -189,7 +204,6 @@
         });
     }
 
-
     function renderSolutionsNavigation(solutionsIds) {
         const solutionsNavContainer = document.getElementById(SOLUTIONS_NAV_CONTAINER_ID);
 
@@ -204,11 +218,6 @@
         }
     }
 
-    function changeDisplayedSolution(desiredSolutionId) {
-        renderSolution(solutions.filter(solution => solution.id == desiredSolutionId)[0]);
-        hilightCode();
-    }
-
     function renderTags(tags) {
         const tagsContainer = document.getElementById(TAGS_CONTAINER_ID);
         tags.forEach(tag => {
@@ -217,18 +226,8 @@
         })
     }
 
-    function extractCodeFromString(string) {
-        let regex = /^```[\s\S]*?```$/gm;
-
-        if (!regex.test(string)) return string;
-        let newString = string.replaceAll(regex, (match, key) => {
-            return match.slice(3, -3);
-        })
-        return newString;
-    }
-
     function hilightCode() {
-        document.querySelectorAll('pre code').forEach((element) => {
+        document.querySelectorAll('code').forEach((element) => {
             hljs.highlightElement(element);
         });
     }

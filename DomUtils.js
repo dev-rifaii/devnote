@@ -1,16 +1,11 @@
 export function setTextForElementById(elementId, text) {
-    document.getElementById(elementId).innerHTML = text;
+    document.getElementById(elementId).textContent = text;
 }
 
 export function createElementWithText(elementName, text) {
     const newElement = document.createElement(elementName);
-    newElement.innerHTML = text;
+    newElement.textContent = text;
     return newElement;
-}
-
-
-export function newLine() {
-    return document.createElement("br");
 }
 
 export function emptyDiv() {
@@ -19,10 +14,14 @@ export function emptyDiv() {
 
 export function preCodeWrapper(code) {
     const codeElement = document.createElement("code");
-    codeElement.innerText = code;
+    codeElement.textContent = code.trim();
 
     const preElement = document.createElement("pre");
     preElement.appendChild(codeElement);
 
-    return preElement;
+    const container = emptyDiv();
+    container.id = "code-container";
+    container.appendChild(preElement);
+
+    return container;
 }
