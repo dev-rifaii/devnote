@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    @import url(./style.css);
+
+    #note-form {
+        align-items: center;
+        gap: 12px;
+    }
+
+    input,
+    textarea {
+        background-color: gray;
+    }
+
+    button[type="submit"] {
+        width: 150px;
+        height: 50px;
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish</title>
+
+    <div id="window">
+        <form id="note-form" class="flex-col">
+            <label id="title" for="title">Title:</label>
+            <input id="title-input" name="title" type="text">
+
+            <label id="description" for="description">Description:</label>
+            <textarea id="description-input" name="description"></textarea>
+
+            <lable id="solution" for="solution">Solution:</lable>
+            <textarea id="solution-input" name="solution"></textarea>
+
+            <label id="link" for="link">Link:</label>
+            <input id="url-input" name="link" type="url">
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+</head>
+
+<body>
+
+</body>
+
+</html>
