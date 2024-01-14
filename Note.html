@@ -69,7 +69,9 @@
 </head>
 
 <body>
-    <header></header>
+    <header>
+        <!-- dynamic -->
+    </header>
     <div id="window">
         <div id="note-container">
             <h1 id="title">
@@ -99,7 +101,8 @@
             </div>
         </div>
     </div>
-    <footer></footer>
+    <footer>
+    </footer>
 </body>
 
 <script type="module">
@@ -109,7 +112,6 @@
     import * as customElementsBuilder from "./CustomElementsBuilder.js";
 
     //ELEMENTS IDENTIFIERS
-    // const SOLUTIONS_CONTAINER_ID = "solution";
     const TAGS_CONTAINER_ID = "tags-container";
     const LINKS_CONTAINER_ID = "links-container";
     const SOLUTIONS_NAV_CONTAINER_ID = "solutions-nav";
@@ -120,6 +122,7 @@
     let solutions;
 
     document.addEventListener("DOMContentLoaded", () => {
+        customElementsBuilder.renderCommonElements();
         const note = fetchNote();
         renderNote(note);
 

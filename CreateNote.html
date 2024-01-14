@@ -43,7 +43,9 @@
 </head>
 
 <body>
-    <header></header>
+    <header>
+        <!-- dynamic -->
+    </header>
     <div id="window">
         <form id="note-form" class="flex-col">
             <label id="title" for="title">Title:</label>
@@ -60,19 +62,23 @@
 
             <button type="submit">Submit</button>
         </form>
-        <footer></footer>
+
     </div>
-
-    <script>
-        import * as domUtils from "./DomUtils.js";
-
-        document.addEventListener("DOMContentLoaded", () => {
-
-        });
-
-        function isNewNote() {
-        }
-    </script>
+    <footer>
+        <!-- dynamic -->
+    </footer>
 </body>
+
+<script type="module">
+    import * as domUtils from "./DomUtils.js";
+    import * as customElementsBuilder from "./CustomElementsBuilder.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        customElementsBuilder.renderCommonElements();
+    });
+
+    function isNewNote() {
+    }
+</script>
 
 </html>
