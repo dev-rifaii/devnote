@@ -5,17 +5,32 @@
 
     #note-form {
         align-items: center;
+        width: 100%;
         gap: 12px;
-    }
-
-    input,
-    textarea {
-        background-color: gray;
+        flex-grow: 1;
     }
 
     button[type="submit"] {
-        width: 150px;
+        min-width: 12%;
         height: 50px;
+    }
+
+    #title-input {
+        width: 70%;
+        height: 40px;
+    }
+
+    #description-input {
+        width: 50%;
+        min-height: 50%;
+    }
+
+    #solution-input {
+        width: 50%;
+    }
+
+    #link-input {
+        width: 20%;
     }
 </style>
 
@@ -36,7 +51,7 @@
             <textarea id="solution-input" name="solution"></textarea>
 
             <label id="link" for="link">Link:</label>
-            <input id="url-input" name="link" type="url">
+            <input id="link-input" name="link" type="url">
 
             <button type="submit">Submit</button>
         </form>
@@ -45,7 +60,6 @@
 </head>
 
 <body>
-
 </body>
 
 </html>
