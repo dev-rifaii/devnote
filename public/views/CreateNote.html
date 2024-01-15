@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
-    @import url(./style.css);
+    @import url(../assets/styles/style.css);
 
     #note-form {
         align-items: center;
@@ -70,8 +70,8 @@
 </body>
 
 <script type="module">
-    import * as domUtils from "./DomUtils.js";
-    import * as customElementsBuilder from "./CustomElementsBuilder.js";
+    import * as domUtils from "../DomUtils.js";
+    import * as customElementsBuilder from "../CustomElementsBuilder.js";
 
     document.addEventListener("DOMContentLoaded", () => {
         customElementsBuilder.renderCommonElements();
